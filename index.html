@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="appTitle">みんなで育てる友情の木</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌳</text></svg>">
+    <meta name="description" content="クラスの友達との交流回数に応じて成長する友情の木のWebアプリケーションです。" data-i18n="appDescription">
+</head>
+<body>
+    <header>
+        <h1 data-i18n="mainHeader">みんなで育てる友情の木</h1>
+        <div class="language-switcher">
+            <label for="lang-select" class="sr-only" data-i18n="langSelectLabel">言語選択</label>
+            <select id="lang-select" title="言語を選択">
+                <option value="ja">日本語</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+    </header>
+
+    <main id="app-container" aria-live="polite">
+        <div id="loading" class="loading-overlay" role="alert" aria-busy="true">
+            <div class="spinner"></div>
+            <p data-i18n="loadingMessage">データを読み込み中...</p>
+        </div>
+
+        <div id="error-message" class="error-overlay" role="alert" style="display: none;">
+            <h2 data-i18n="errorTitle">エラーが発生しました</h2>
+            <p id="error-details"></p>
+            <p id="error-suggestion" data-i18n="errorSuggestionDefault">時間をおいて再読み込みするか、管理者に連絡してください。</p>
+            <button id="retry-button" data-i18n="retryButton">再試行</button>
+        </div>
+
+        <div id="tree-display">
+            <div id="status-info">
+                <p><span data-i18n="currentStageLabel">現在の成長段階:</span> <strong id="stage-display" aria-live="polite">---</strong></p>
+                <p><span data-i18n="totalInteractionsLabel">累計交流回数:</span> <strong id="total-value-display" aria-live="polite">---</strong></p>
+                <div class="progress-container" aria-labelledby="progress-label">
+                    <p id="progress-label" class="sr-only" data-i18n="progressLabel">次の段階への進捗</p>
+                    <progress id="progress-bar" value="0" max="100" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></progress>
+                    <span id="progress-text" aria-live="polite"></span>
+                </div>
+                 <p id="recent-progress" aria-live="polite" style="display: none;"></p> </div>
+
+            <div id="tree-container" role="img" aria-label="友情の木の現在の画像" data-i18n="treeImageAlt">
+                 <div id="environment-background" class="environment"></div>
+                <div id="tree-image-wrapper">
+                    </div>
+                 <div id="realtime-notice" class="notice-effect">✨</div>
+            </div>
+
+            <div id="milestone-message" class="milestone-overlay" role="alert" style="display: none;">
+                <h2 id="milestone-title"></h2>
+                <p id="milestone-body"></p>
+                <button id="close-milestone" data-i18n="closeButton">閉じる</button>
+            </div>
+        </div>
+
+        <details id="usage-stats-section" class="usage-stats">
+            <summary data-i18n="usageStatsTitle">利用統計 (簡易)</summary>
+            <div id="usage-stats-content">
+                <p data-i18n="loadingStats">統計データを読み込み中...</p>
+                </div>
+        </details>
+
+    </main>
+
+    <footer>
+        <a href="admin.html" class="admin-link" data-i18n="adminLink" aria-label="管理画面へ移動">設定</a>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
