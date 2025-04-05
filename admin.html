@@ -1,1 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="adminTitle">管理画面 - みんなで育てる友情の木</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+    <meta name="description" content="「みんなで育てる友情の木」アプリケーションの設定管理画面です。" data-i18n="adminDescription">
+</head>
+<body>
+    <header>
+        <h1 data-i18n="adminHeader">管理画面</h1>
+        <a href="index.html" id="home-btn" class="header-link" data-i18n="backToMainScreen" aria-label="メイン画面に戻る">メイン画面へ</a>
+    </header>
 
+    <div class="container">
+        <nav id="sidebar" aria-labelledby="nav-heading">
+            <h2 id="nav-heading" class="sr-only" data-i18n="navigationMenu">ナビゲーションメニュー</h2>
+            <ul>
+                <li><button class="nav-button active" data-target="basic" role="tab" aria-selected="true" aria-controls="basic-panel" data-i18n="navBasic">基本設定</button></li>
+                <li><button class="nav-button" data-target="stages" role="tab" aria-selected="false" aria-controls="stages-panel" data-i18n="navStages">成長段階</button></li>
+                <li><button class="nav-button" data-target="images" role="tab" aria-selected="false" aria-controls="images-panel" data-i18n="navImages">画像設定</button></li>
+                <li><button class="nav-button" data-target="stats" role="tab" aria-selected="false" aria-controls="stats-panel" data-i18n="navStats">統計</button></li>
+                <li><button class="nav-button" data-target="history" role="tab" aria-selected="false" aria-controls="history-panel" data-i18n="navHistory">設定履歴</button></li>
+                <li><button class="nav-button" data-target="backup" role="tab" aria-selected="false" aria-controls="backup-panel" data-i18n="navBackupRestore">バックアップ/復元</button></li>
+                <li><button class="nav-button" data-target="other" role="tab" aria-selected="false" aria-controls="other-panel" data-i18n="navOther">その他設定</button></li>
+            </ul>
+            <div class="debug-toggle">
+                 <label for="debug-mode">
+                     <input type="checkbox" id="debug-mode"> <span data-i18n="debugModeLabel">デバッグモード</span>
+                 </label>
+             </div>
+        </nav>
+
+        <main id="main-content">
+            <div id="message-area">
+                 <div id="loader" class="loader" style="display: none;" role="alert" aria-busy="true">
+                     <div class="spinner"></div> <span data-i18n="processing">処理中...</span>
+                 </div>
+                 <div id="success-message" class="message success" style="display: none;" role="status"></div>
+                 <div id="error-message" class="message error" style="display: none;" role="alert"></div>
+                 <div id="warning-message" class="message warning" style="display: none;" role="alert"></div>
+            </div>
+
+            <section id="basic-panel" class="tab-panel active" role="tabpanel" aria-labelledby="nav-basic">
+                <h2 data-i18n="basicSettingsTitle">基本設定</h2>
+
+                <div class="form-group">
+                    <label for="api-url" data-i18n="apiUrlLabel">API URL (GAS Web App URL):</label>
+                    <input type="url" id="api-url" required aria-describedby="api-url-desc">
+                    <p id="api-url-desc" class="description" data-i18n="apiUrlDesc">Google Apps ScriptのWebアプリとしてデプロイしたURLを入力してください。</p>
+                    <p class="warning" data-i18n="apiUrlWarning">(N-03) このURLはブラウザに保存されます。共有PCでは注意してください。</p>
+                </div>
+
+                <div class="form-group">
+                    <button id="test-connection-btn" class="button" data-i18n="testConnectionBtn">接続テスト</button>
+                </div>
+
+                </section>
+
+            <section id="stages-panel" class="tab-panel" role="tabpanel" aria-labelledby="nav-stages" style="display: none;">
+                <h2 data-i18n="stageSettingsTitle">成長段階の設定</h2>
+                <p data-i18n="stageDesc">各成長段階に到達するために必要な「累計」交流回数を設定します。段階0は常に0です。</p>
+
+                <div class="form-group inline-group">
+                    <label for="max-meetings" data-i18n="maxMeetingsLabel">想定最大交流回数:</label>
+                    <input type="number" id="max-meetings" min="1" value="1000" aria-describedby="max-meetings-desc">
+                    <button id="auto-distribute-btn" class="button secondary" data-i18n="autoDistributeBtn">均等割り振り</button>
+                    <button id="reset-stages-btn" class="button secondary" data-i18n="resetStagesBtn">初期値リセット</button>
+                     <p id="max-meetings-desc" class="description" data-i18n="maxMeetingsDesc">自動割り振り機能で使用します。</p>
+                </div>
+
+                <div class="table-container">
+                    <table id="stages-table" aria-label="成長段階の閾値設定">
+                        <thead>
+                            <tr>
+                                <th data-i18n="tableHeaderStage">段階</th>
+                                <th data-i18n="tableHeaderThreshold">必要累計交流回数 (閾値)</th>
+                                <th data-i18n="tableHeaderNotes">備考</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stages-tbody">
+                            </tbody>
+                    </table>
+                </div>
+                 <div class="form-group">
+                     <button id="save-stages-only-btn" class="button primary" data-i18n="saveStagesOnlyBtn">成長段階の設定のみ保存</button>
+                 </div>
+            </section>
+
+            <section id="images-panel" class="tab-panel" role="tabpanel" aria-labelledby="nav-images" style="display: none;">
+                <h2 data-i18n="imageSettingsTitle">画像設定</h2>
+                <p data-i18n="imageDesc">各成長段階で表示する画像を設定します。URLまたはGoogle DriveのファイルIDを入力するか、ファイルをアップロードしてください。</p>
+
+                <div class="image-setting-form">
+                    <div class="form-group">
+                        <label for="stage-selector" data-i18n="selectStageLabel">設定する段階:</label>
+                        <select id="stage-selector">
+                            </select>
+                    </div>
+
+                    <div class="form-group drop-area" id="drop-area-url" role="group" aria-labelledby="url-id-heading">
+                        <h3 id="url-id-heading" data-i18n="setUrlIdTitle">URL または Drive IDで設定</h3>
+                        <label for="image-id-url-input" class="sr-only" data-i18n="imageUrlIdLabel">画像URLまたはDrive ID</label>
+                        <input type="text" id="image-id-url-input" placeholder="https://... または DriveファイルID" aria-describedby="image-id-url-desc">
+                        <p id="image-id-url-desc" class="description" data-i18n="imageUrlIdDesc">画像のURLか、共有設定されたGoogle DriveのファイルIDを入力。ドラッグ&ドロップも可能。</p>
+                        <button id="set-id-url-btn" class="button" data-i18n="setImageBtn">設定</button>
+                        <button id="clear-image-btn" class="button secondary" data-i18n="clearImageBtn">クリア</button>
+                    </div>
+
+                    <div class="form-group drop-area" id="drop-area-upload" role="group" aria-labelledby="upload-heading">
+                         <h3 id="upload-heading" data-i18n="uploadImageTitle">画像をアップロードして設定</h3>
+                        <label for="image-upload-input" class="sr-only" data-i18n="selectImageFileLabel">画像ファイル選択</label>
+                        <input type="file" id="image-upload-input" accept="image/png, image/jpeg, image/gif" aria-describedby="image-upload-desc">
+                        <p id="image-upload-desc" class="description" data-i18n="imageUploadDesc">PNG, JPG, GIF (8MBまで)。推奨 1280x720px。ここにファイルをドラッグ&ドロップも可能。</p>
+                        <button id="upload-image-btn" class="button" disabled data-i18n="uploadAndSetBtn">アップロードして設定</button>
+                        <div id="upload-progress" style="display: none;">
+                             <progress value="0" max="100"></progress> <span></span>
+                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <h3 data-i18n="currentImagePreview">現在の画像プレビュー:</h3>
+                        <img id="image-preview" src="" alt="選択中の段階の画像プレビュー" style="display: none; max-width: 200px; max-height: 150px; border: 1px solid #ccc;">
+                        <p id="no-image-preview" data-i18n="noImageSet">画像は設定されていません。</p>
+                    </div>
+                </div>
+
+                 <hr>
+                 <div class="environment-setting">
+                     <h3 data-i18n="envImageSettingsTitle">環境背景設定 (オプション)</h3>
+                     <p data-i18n="envImageDesc">木の成長に合わせて変化する背景画像を設定します。URLまたはDrive IDを入力してください。複数設定すると段階に応じて循環します。</p>
+                     <div id="environment-inputs">
+                         </div>
+                     <button id="add-env-image-btn" class="button secondary" data-i18n="addEnvImageBtn">背景画像を追加</button>
+                 </div>
+
+
+                 <hr>
+                <div class="form-group">
+                    <h3 data-i18n="currentImageGridTitle">設定済み画像一覧</h3>
+                    <button id="clear-all-images-btn" class="button danger" data-i18n="clearAllImagesBtn">全ての画像設定をクリア (A-09)</button>
+                    <div id="image-grid" class="image-grid-container">
+                        </div>
+                </div>
+                <div class="form-group">
+                    <button id="save-images-only-btn" class="button primary" data-i18n="saveImagesOnlyBtn">画像設定のみ保存</button>
+                </div>
+            </section>
+
+            <section id="stats-panel" class="tab-panel" role="tabpanel" aria-labelledby="nav-stats" style="display: none;">
+                <h2 data-i18n="statsDashboardTitle">統計ダッシュボード (A-19)</h2>
+                <p data-i18n="statsDesc">アプリケーションの利用状況や成長の記録を確認できます。</p>
+                <div id="stats-content">
+                    <p data-i18n="loadingStats">統計データを読み込み中...</p>
+                    </div>
+            </section>
+
+            <section id="history-panel" class="tab-panel" role="tabpanel" aria-labelledby="nav-history" style="display: none;">
+                 <h2 data-i18n="historyTitle">設定履歴 (A-21)</h2>
+                 <p data-i18n="historyDesc">過去の設定変更履歴を確認し、特定の時点の設定に復元（ロールバック）できます。</p>
+                 <div class="table-container">
+                     <table id="history-table" aria-label="設定変更履歴">
+                         <thead>
+                             <tr>
+                                 <th data-i18n="historyTimestamp">変更日時</th>
+                                 <th data-i18n="historyChanges">変更内容 (概要)</th>
+                                 <th data-i18n="historyActions">操作</th>
+                             </tr>
+                         </thead>
+                         <tbody id="history-tbody">
+                             </tbody>
+                     </table>
+                 </div>
+            </section>
+
+            <section id="backup-panel" class="tab-panel" role="tabpanel" aria-labelledby="nav-backup" style="display: none;">
+                 <h2 data-i18n="backupRestoreTitle">設定のバックアップと復元 (A-20)</h2>
+                 <div class="form-group">
+                     <h3 data-i18n="backupTitle">バックアップ</h3>
+                     <p data-i18n="backupDesc">現在の設定（成長段階、画像設定など）をファイルにエクスポートします。</p>
+                     <button id="export-settings-btn" class="button" data-i18n="exportBtn">設定をエクスポート</button>
+                 </div>
+                 <hr>
+                 <div class="form-group">
+                     <h3 data-i18n="restoreTitle">復元</h3>
+                     <p data-i18n="restoreDesc">以前にエクスポートした設定ファイル（JSON形式）をインポートして復元します。現在の設定は上書きされます。</p>
+                     <label for="import-file-input" class="button secondary" data-i18n="selectImportFile">復元ファイルを選択</label>
+                     <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                     <span id="import-file-name"></span>
+                     <button id="import-settings-btn" class="button primary" disabled data-i18n="importBtn">インポートして復元</button>
+                 </div>
+            </section>
+
+            <section id="other-panel" class="tab-panel" role="tabpanel" aria-labelledby="nav-other" style="display: none;">
+                <h2 data-i18n="otherSettingsTitle">その他の設定</h2>
+
+                <div class="form-group">
+                    <label for="polling-interval" data-i18n="pollingIntervalLabel">データ自動更新間隔 (秒):</label>
+                    <input type="number" id="polling-interval" min="15" max="300" step="1" value="30" aria-describedby="polling-interval-desc">
+                    <p id="polling-interval-desc" class="description" data-i18n="pollingIntervalDesc">メイン画面がデータを更新する間隔（推奨: 15～300秒）。短すぎるとサーバー負荷が高まります。</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="default-language" data-i18n="defaultLanguageLabel">デフォルト表示言語:</label>
+                    <select id="default-language">
+                        <option value="ja" data-i18n="langJapanese">日本語</option>
+                        <option value="en" data-i18n="langEnglish">English</option>
+                    </select>
+                    <p class="description" data-i18n="defaultLanguageDesc">管理画面およびメイン画面の初期表示言語を設定します。</p>
+                </div>
+
+                 <div class="form-group">
+                     <h3 data-i18n="spreadsheetMappingTitle">スプレッドシート列名マッピング (開発中)</h3>
+                     <p data-i18n="spreadsheetMappingDesc">データ取得元のスプレッドシートの列名を指定します。</p>
+                     <label for="meeting-column">交流回数列名:</label>
+                     <input type="text" id="meeting-column" placeholder="例: 友達と会った回数">
+                      </div>
+
+            </section>
+
+            <div class="save-actions">
+                 <button id="save-settings-btn" class="button primary large" data-i18n="saveAllSettingsBtn">すべての設定を保存</button>
+            </div>
+
+            <div id="debug-info" class="debug-output" style="display: none;">
+                 <h3 data-i18n="debugInfoTitle">デバッグ情報</h3>
+                 <pre id="debug-output-content"></pre>
+            </div>
+
+            <form id="fallback-form" method="post" target="fallback-iframe" style="display: none;">
+                 <input type="hidden" name="action" value="saveConfig">
+                 <input type="hidden" id="form-post-data" name="data">
+                 </form>
+             <iframe name="fallback-iframe" style="display: none;"></iframe>
+
+        </main>
+    </div> <script src="admin.js"></script>
+</body>
+</html>
