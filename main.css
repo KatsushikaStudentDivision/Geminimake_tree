@@ -1,0 +1,380 @@
+/* main.css - みんなで育てる友情の木 メイン画面スタイル */
+
+/* 基本設定と変数 */
+:root {
+    --primary-color: #4CAF50; /* 木の緑 */
+    --secondary-color: #FFC107; /* 強調色 (黄) */
+    --background-color: #f0f4f8; /* 背景色 (薄い青灰) */
+    --text-color: #333;
+    --error-color: #f44336;
+    --error-bg-color: #ffebee;
+    --loading-bg-color: rgba(255, 255, 255, 0.8);
+    --border-radius: 8px;
+    --progress-bar-bg: #e0e0e0;
+    --contrast-threshold: 4.5; /* N-06: コントラスト比 */
+    --focus-outline: 2px solid var(--secondary-color); /* N-06: フォーカス */
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 900px;
+    margin: 2rem auto;
+    width: 90%;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative; /* ローディング/エラー表示のため */
+}
+
+/* F-12: 言語切替 */
+.language-switcher label.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+.language-switcher select {
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+}
+.language-switcher select:focus { /* N-06: フォーカス */
+    outline: var(--focus-outline);
+    outline-offset: 2px;
+}
+
+
+/* F-01: データ表示エリア */
+#status-info {
+    background-color: #e8f5e9; /* 薄い緑 */
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+    border: 1px solid #c8e6c9;
+}
+
+#status-info p {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+#status-info strong {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* F-01 追加: プログレスバー */
+.progress-container {
+    margin-top: 1rem;
+}
+progress#progress-bar {
+    width: 100%;
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: none; /* デフォルトの枠線を消す */
+    background-color: var(--progress-bar-bg);
+    /* アクセシビリティ: スクリーンリーダーはaria属性を読む */
+}
+/* Webkit (Chrome, Safari) */
+progress#progress-bar::-webkit-progress-bar {
+    background-color: var(--progress-bar-bg);
+    border-radius: 10px;
+}
+progress#progress-bar::-webkit-progress-value {
+    background-color: var(--primary-color);
+    border-radius: 10px 0 0 10px; /* 左端だけ丸める */
+    transition: width 0.5s ease-in-out;
+}
+/* Firefox */
+progress#progress-bar::-moz-progress-bar {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+}
+#progress-text {
+    display: block;
+    text-align: right;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+    color: #555;
+}
+
+#recent-progress {
+    margin-top: 0.5rem;
+    font-style: italic;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+/* F-02: 木の画像表示 */
+#tree-display {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+#tree-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px; /* 画像の最大幅 */
+    height: 400px; /* 固定の高さを設定 (必要に応じて調整) */
+    margin: 0 auto;
+    overflow: hidden; /* アニメーション用 */
+    border-radius: var(--border-radius);
+    background-color: #e0f2f7; /* 仮の背景色 */
+}
+
+/* F-02 追加: 背景要素 */
+.environment {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: background-image 1s ease-in-out;
+    z-index: 1;
+    /* 例: 背景画像はJSで設定 */
+    /* background-image: url('path/to/spring-background.jpg'); */
+}
+
+#tree-image-wrapper {
+    position: relative; /* 画像の重ね合わせのため */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* 木を下に配置 */
+    z-index: 2; /* 背景より手前 */
+}
+
+.tree-image {
+    position: absolute; /* アニメーションのため重ねる */
+    bottom: 0; /* 下端に揃える */
+    max-width: 80%;
+    max-height: 90%;
+    height: auto;
+    object-fit: contain; /* アスペクト比を保つ */
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out; /* F-03: フェードアニメーション */
+    visibility: hidden; /* opacity 0でも場所を取らないように */
+}
+
+.tree-image.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* F-03 追加: リアルタイム通知エフェクト */
+#realtime-notice {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 3rem;
+    opacity: 0;
+    z-index: 3; /* 画像より手前 */
+    pointer-events: none; /* クリックを妨げない */
+    transition: transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.5s ease-out;
+}
+#realtime-notice.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.5);
+}
+@keyframes pulse { /* 読み込み中などの汎用パルス */
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* F-05: ローディング表示 */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--loading-bg-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    border-radius: var(--border-radius); /* 親要素に合わせる */
+    text-align: center;
+}
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: var(--primary-color);
+    animation: spin 1s ease infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* F-06: エラー表示 */
+.error-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--error-bg-color);
+    color: var(--error-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    box-sizing: border-box;
+    z-index: 99;
+    border-radius: var(--border-radius);
+    text-align: center;
+    border: 1px solid var(--error-color);
+}
+.error-overlay h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--error-color);
+}
+.error-overlay p {
+    margin-bottom: 1rem;
+}
+#retry-button {
+    padding: 0.6rem 1.2rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+#retry-button:hover, #retry-button:focus { /* N-06: フォーカス */
+    background-color: #388E3C;
+    outline: var(--focus-outline);
+    outline-offset: 2px;
+}
+/* エラー時の視覚フィードバック例 */
+body.error-state #app-container {
+    animation: shake 0.5s;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+
+/* F-03 追加: マイルストーン表示 */
+.milestone-overlay {
+    position: fixed; /* 画面全体に表示 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 101;
+    padding: 2rem;
+    box-sizing: border-box;
+    color: white;
+    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s;
+}
+.milestone-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+.milestone-overlay h2 {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+.milestone-overlay p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+#close-milestone {
+    padding: 0.8rem 1.5rem;
+    background-color: var(--secondary-color);
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+#close-milestone:hover, #close-milestone:focus { /* N-06: フォーカス */
+    background-color: #FFB300;
+    outline: var(--focus-outline);
+    outline-offset: 2px;
+}
+
+/* F-13: 利用統計 */
+.usage-stats {
+    margin-top: 2rem;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    overflow: hidden; /* 中身がはみ出ないように */
+}
+.usage-stats summary {
+    background-color: #f5f5f5;
+    padding: 0.8rem 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    outline: none; /* デフォルトのアウトラインを消す */
+}
+.usage-stats summary:focus { /* N-06: フォーカス */
+     box-shadow: inset 0 0 0 2px var(--secondary-color);
+}
+.usage-stats summary::-webkit-details
